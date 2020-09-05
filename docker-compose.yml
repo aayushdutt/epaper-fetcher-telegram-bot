@@ -6,7 +6,7 @@ services:
     environment:
       - TELEGRAM_BOT_TOKEN=
     volumes:
-      - 'telegramDatabase:/usr/src/app/databases'
+      - './databases:/usr/src/app/databases'
 
 volumes:
   telegramDatabase:
