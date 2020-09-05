@@ -72,7 +72,7 @@ menu.simpleButton('Check!', 'checkForUpdates', {
         reply = await check(ctx)
         if(!reply) return
         ctx.reply("checking for updates... ")
-        ctx.replyWithMarkdown(reply)
+        ctx.reply(reply)
         return
     }
 })
@@ -91,7 +91,7 @@ bot.hears('hi', (ctx) => ctx.reply('Hey there'))
 
 bot.command('/check', async (ctx) => {
     logMsg(ctx)
-
+    console.log("before check")
     reply = await check(ctx)
     console.log("REPLY:      ", reply)
     if(!reply) return
@@ -120,6 +120,7 @@ async function check(ctx) {
     data.forEach((el, idx) => {
         reply += `${idx+1}. ${checkers[idx].name} (${el.date}): ${el.downloadURL} \n`
     })
+    reply += ' '
     return reply;
 }
 
