@@ -1,7 +1,8 @@
 version: '2'
 services:
   telebot:
-    image: 'aayushdutt/telegram-updator-bot'
+    container_name: epaper--bot-telegram
+    build: .
     environment:
       - TELEGRAM_BOT_TOKEN=
     volumes:
