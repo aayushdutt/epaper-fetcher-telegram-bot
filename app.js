@@ -31,4 +31,4 @@ async function notifyOnAvailable() {
   }
 }
 
-setInterval(notifyOnAvailable, 10000);
+setInterval(notifyOnAvailable, 9000);

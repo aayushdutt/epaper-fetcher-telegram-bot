@@ -23,6 +23,10 @@ class htmlFetcher {
         }
         console.log("Available! returning true");
         return true;
+      })
+      .catch(() => {
+        console.log("error occured, returning true");
+        return true;
       });
   }
 }
