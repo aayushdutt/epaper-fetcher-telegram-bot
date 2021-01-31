@@ -1,13 +1,7 @@
-version: '2'
+version: "2"
 services:
   telebot:
-    container_name: epaper--bot-telegram
+    container_name: ps5-bot-telegram
     build: .
     environment:
       - TELEGRAM_BOT_TOKEN=
-    volumes:
-      - './databases:/usr/src/app/databases'
-
-volumes:
-  telegramDatabase:
-    driver: local

@@ -1,37 +1,39 @@
-const rp = require('request-promise');
-const cheerio = require('cheerio')
+const rp = require("request-promise");
+const cheerio = require("cheerio");
 
 class htmlFetcher {
-    constructor(S, URL) {
-        this.selector = S;
-        this.url = URL
-    }
+  constructor(S, URL) {
+    this.selector = S;
+    this.url = URL;
+  }
 
-    fetchData() {
-        return  rp(this.url)
-                .then(html => cheerio.load(html))
-                .then($ => $(this.selector).text().trim())
-    }
-
-    fetchLink() {
-        return  rp(this.url)
-                .then(html => cheerio.load(html))
-                .then($ => this.getDownloadLink($(this.selector).children().eq(0).text(), $(this.selector).children().eq(1).children().eq(0).attr('href')))
-    }
-
-    getDownloadLink(date, link) {
-        const linkSplitted = link.split('/')
-        const id = linkSplitted[linkSplitted.length - 2]
-        
-        return {
-            srcUrl: link,
-            downloadURL: `https://drive.google.com/u/0/uc?id=${id}&export=download/`,
-            date
+  isPSAvailable() {
+    return rp(this.url)
+      .then((html) => cheerio.load(html))
+      .then(($) => {
+        const ans = $(this.selector);
+        if (ans) {
+          console.log("Text is: ", ans.text());
+          if (
+            ans.text().trim() === "NOTIFY ME" ||
+            ans.text().trim() ===
+              "We’re temporarily out of stock on PS5. Subscribe to this page and stay tuned for updates."
+          )
+            return false;
         }
-    }
+        console.log("Available! returning true");
+        return true;
+      });
+  }
 }
 
-obj = new htmlFetcher("body > div.row > div.col.l6.m6.s12 > div > table > tbody > tr:nth-child(1)", "https://iasbano.com/upsc_thehindu_free_download.php#download_the_hindu")
-obj.fetchLink()//.then(a => console.log(a))
+const ps5Flipkart = new htmlFetcher(
+  "#container > div > div._2c7YLP.UtUXW0._6t1WkM._3HqJxg > div._1YokD2._2GoDe3 > div._1YokD2._3Mn1Gg.col-5-12._78xt5Y > div:nth-child(3) > div > button",
+  "https://www.flipkart.com/sony-playstation-5-cfi-1008a01r-825-gb-astro-s-playroom/p/itma0201bdea62fa"
+);
+const ps5Amazon = new htmlFetcher(
+  "[id^=contentGrid_] > div > div:nth-child(3) > div > div > div > h2",
+  "https://www.amazon.in/b?ie=UTF8&node=21725163031"
+);
 
-module.exports = htmlFetcher
+module.exports = { ps5Flipkart, ps5Amazon };
