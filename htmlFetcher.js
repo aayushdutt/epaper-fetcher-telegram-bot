@@ -1,5 +1,6 @@
 const rp = require("request-promise");
 const cheerio = require("cheerio");
+const { log } = require("./utils");
 
 class htmlFetcher {
   constructor(S, URL) {
@@ -7,27 +8,28 @@ class htmlFetcher {
     this.url = URL;
   }
 
-  isPSAvailable() {
-    return rp(this.url)
-      .then((html) => cheerio.load(html))
-      .then(($) => {
-        const ans = $(this.selector);
-        if (ans) {
-          console.log("Text is: ", ans.text());
-          if (
-            ans.text().trim() === "NOTIFY ME" ||
-            ans.text().trim() ===
-              "We’re temporarily out of stock on PS5. Subscribe to this page and stay tuned for updates."
-          )
-            return false;
-        }
-        console.log("Available! returning true");
-        return true;
-      })
-      .catch(() => {
-        console.log("error occured, returning true");
-        return true;
-      });
+  async isPSAvailable() {
+    try {
+      const html = await rp(this.url);
+      const $ = await cheerio.load(html);
+
+      const selectedElement = $(this.selector);
+      if (selectedElement) {
+        log("Text is: ", selectedElement.text());
+        if (
+          selectedElement.text().trim() === "NOTIFY ME" ||
+          selectedElement.text().trim() ===
+            "We’re temporarily out of stock on PS5. Subscribe to this page and stay tuned for updates."
+        )
+          return { status: false };
+      }
+
+      log("Available! returning true");
+      return { status: true, err: false };
+    } catch (err) {
+      log("error occured, returning true", err);
+      return { status: true, err: true, msg: err };
+    }
   }
 }
 

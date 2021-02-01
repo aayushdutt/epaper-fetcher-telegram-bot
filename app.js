@@ -1,5 +1,6 @@
 const Telegram = require("telegraf/telegram");
 const { ps5Flipkart, ps5Amazon } = require("./htmlFetcher");
+const { log } = require("./utils");
 const tg = new Telegram(process.env.TELEGRAM_BOT_TOKEN);
 
 async function notify(msg) {
@@ -8,26 +9,30 @@ async function notify(msg) {
 }
 
 async function notifyOnAvailable() {
-  const now = new Date();
-  const time = `${now.getHours()}:${now.getMinutes()}`;
-  console.log(time + " checking...");
-  const isAvailableFlipkart = await ps5Flipkart.isPSAvailable();
-  const isAvailableAmazon = await ps5Amazon.isPSAvailable();
+  log("checking...");
+  const flipkartAvailibility = await ps5Flipkart.isPSAvailable();
+  const amazonAvailibility = false; //await ps5Amazon.isPSAvailable();
 
-  if (isAvailableFlipkart) {
-    console.log(time + "Flipkart available, sending msg");
-    notify(
-      "PS5 Available on Flipkart!: https://www.flipkart.com/sony-playstation-5-cfi-1008a01r-825-gb-astro-s-playroom/p/itma0201bdea62fa"
-    );
+  if (flipkartAvailibility.status) {
+    log("Flipkart available, sending msg");
+    if (flipkartAvailibility.err) {
+      await notify(
+        "Error on Flipkart, might be available: https://www.flipkart.com/sony-playstation-5-cfi-1008a01r-825-gb-astro-s-playroom/p/itma0201bdea62fa"
+      );
+      await notify(flipkartAvailibility.msg.toString());
+    } else
+      await notify(
+        "PS5 Available on Flipkart!: https://www.flipkart.com/sony-playstation-5-cfi-1008a01r-825-gb-astro-s-playroom/p/itma0201bdea62fa"
+      );
   }
-  if (isAvailableAmazon) {
-    console.log(time + "Amazon available, sending msg");
-    notify(
+  if (amazonAvailibility.status) {
+    log("Amazon available, sending msg");
+    await notify(
       "PS5 Available on Amazon!: https://www.amazon.in/b?ie=UTF8&node=21725163031"
     );
   }
-  if (!isAvailableAmazon && !isAvailableFlipkart) {
-    console.log(time + " Stocks not available");
+  if (!flipkartAvailibility.status && !amazonAvailibility.status) {
+    log("Stocks not available");
   }
 }
 

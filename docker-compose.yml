@@ -5,3 +5,5 @@ services:
     build: .
     environment:
       - TELEGRAM_BOT_TOKEN=
+    volumes:
+      - "./logs:/usr/src/app/logs"
