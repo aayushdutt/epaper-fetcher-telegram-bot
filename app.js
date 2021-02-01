@@ -1,5 +1,5 @@
 const Telegram = require("telegraf/telegram");
-const { ps5Flipkart, ps5Amazon } = require("./htmlFetcher");
+const { ps5Flipkart, ps5Amazon, ps5Vijay } = require("./htmlFetcher");
 const { log } = require("./utils");
 const tg = new Telegram(process.env.TELEGRAM_BOT_TOKEN);
 
@@ -10,7 +10,8 @@ async function notify(msg) {
 
 async function notifyOnAvailable() {
   log("checking...");
-  const flipkartAvailibility = await ps5Flipkart.isPSAvailable();
+  const flipkartAvailibility = await ps5Flipkart.isAvailable();
+  const vijayAvailibility = await ps5Vijay.isAvailable();
   const amazonAvailibility = false; //await ps5Amazon.isPSAvailable();
 
   if (flipkartAvailibility.status) {
@@ -31,7 +32,17 @@ async function notifyOnAvailable() {
       "PS5 Available on Amazon!: https://www.amazon.in/b?ie=UTF8&node=21725163031"
     );
   }
-  if (!flipkartAvailibility.status && !amazonAvailibility.status) {
+  if (vijayAvailibility.status) {
+    log("Vijay available, sending msg");
+    await notify(
+      "PS5 Available on Vijay!: https://www.vijaysales.com/sony-ps5-console/15387"
+    );
+  }
+  if (
+    !flipkartAvailibility.status &&
+    !amazonAvailibility.status &&
+    !vijayAvailibility.status
+  ) {
     log("Stocks not available");
   }
 }
