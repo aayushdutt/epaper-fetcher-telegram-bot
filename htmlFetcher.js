@@ -27,8 +27,15 @@ class htmlFetcher {
       if (isAvailable) return { status: true, err: false, msg: this.name };
       return { status: false };
     } catch (err) {
-      log(this.name, " error occured, returning true", err);
-      return { status: true, err: true, msg: err };
+      if (
+        err ===
+        "RequestError: Error: Client network socket disconnected before secure TLS connection was established"
+      ) {
+        log(this.name, err, "returning false");
+        return { status: false, err: true, msg: err };
+      }
+      log(this.name, "error occured, returning true", err);
+      return { status: false, err: true, msg: err };
     }
   }
 
@@ -78,6 +85,21 @@ const ps5Amazon = new htmlFetcher(
   }
 );
 
+const ps5Amazon2 = new htmlFetcher(
+  "#availability > span",
+  "https://www.amazon.in/gp/product/B08FV5GC28/",
+  "amazon2",
+  (text) => {
+    log("amazon2 text is", text);
+    if (text === "Currently unavailable.") {
+      log("amazon2 false");
+      return false;
+    }
+    log("amazon2 available true");
+    return true;
+  }
+);
+
 const ps5Vijay = new htmlFetcher(
   "#ContentPlaceHolder1_divsoldout",
   "https://www.vijaysales.com/sony-ps5-console/15387",
@@ -93,4 +115,4 @@ const ps5Vijay = new htmlFetcher(
   }
 );
 
-module.exports = { ps5Flipkart, ps5Amazon, ps5Vijay };
+module.exports = { ps5Flipkart, ps5Amazon, ps5Vijay, ps5Amazon2 };
